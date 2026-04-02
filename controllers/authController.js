@@ -50,28 +50,34 @@ exports.signin = async (req, res) => {
 
         const existingUser = await User.findOne({ email }).select('+password');
 
-        if (!existingUser){
+        if (!existingUser) {
             return res.status(401).json({ success: false, message: "User does not exist" })
         }
 
         const result = await doHashValidation(password, existingUser.password);
 
-        if(!result){
+        if (!result) {
             return res.status(401).json({
-                success:false,
-                message:"invalid credentials!"
+                success: false,
+                message: "invalid credentials!"
             })
         }
 
-        const token = jwt.sign({
-            userId: existingUser._id,
-            email: existingUser.email,
-            verified: existingUser.verified,
-        }, process.env.TOKEN_SECRET)
+        const token = jwt.sign(
+            {
+                userId: existingUser._id,
+                email: existingUser.email,
+                verified: existingUser.verified,
+            },
+            process.env.TOKEN_SECRET,
+            {
+                expiresIn: '8h'
+            }
+        );
 
         res.cookie('Authorization', 'Bearer ' + token, {
-            expires: new Date(Date.now() + 8 * 3600000), 
-            httpOnly: process.env.NODE_ENV === 'production', 
+            expires: new Date(Date.now() + 8 * 3600000),
+            httpOnly: process.env.NODE_ENV === 'production',
             secure: process.env.NODE_ENV === 'production'
         }).json({
             success: true,
