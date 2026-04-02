@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken')
 const { signupSchema, signinSchema } = require("../middlewares/validator")
 const User = require("../models/usersModel");
-const { doHash, doHashValidation } = require("../utils/hashing");
+const { doHash, doHashValidation, hmacProcess } = require("../utils/hashing");
+const transport = require('../middlewares/sendMail');
 
 exports.signup = async (req, res) => {
     const { email, password } = req.body;
@@ -96,4 +97,50 @@ exports.signout = async (req, res) => {
         success: true,
         message: "Logged out succesfully"
     })
+}
+
+exports.sendVerificationCode = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const existingUser = await User.findOne({ email })
+        if (!existingUser) {
+            return res.status(404).json({ success: false, message: "User does not exist" })
+        }
+        if (existingUser.verified) {
+            return res.status(400).json({ success: false, message: "You are already verified" })
+        }
+
+        const codeValue = Math.floor(Math.random() * 1000000).toString();
+
+        let info = await transport.sendMail({
+            from: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
+            to: existingUser.email,
+            subject: "verification code",
+            html: '<h1>' + codeValue + '</h1>'
+
+        })
+
+        if (info.accepted[0] === existingUser.email) {
+            const hashedCodevalue = hmacProcess(
+                codeValue,
+                process.env.HMAC_VERIFICATION_CODE_SECRET
+            );
+            existingUser.sendVerificationCode = hashedCodevalue;
+            existingUser.sendVerificationCodeValidation = Date.now();
+            await existingUser.save();
+            return res.status(200).json({
+                success: true,
+                message: "Code sent."
+            })
+        }
+        res.status(400).json({
+            success: false,
+            message: "Code sent failed."
+        })
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 }
