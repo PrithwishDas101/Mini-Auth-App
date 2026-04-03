@@ -20,11 +20,11 @@ const userSchema = mongoose.Schema({
         default: false,
     },
     verificationCode: {
-        type: Number,
+        type: String,
         select: false,
     },
     verificationCodeValidation: {
-        type: String,
+        type: Number,
         select: false,
     },
     forgotPasswordCode: {
