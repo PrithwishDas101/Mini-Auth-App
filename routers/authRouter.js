@@ -11,7 +11,7 @@ router.patch('/send-verification-code', identifier, authController.sendVerificat
 router.patch('/verify-verification-code', identifier, authController.verifyVerificationCode)
 
 router.patch('/change-password', identifier, authController.changePassword)
-
-
+router.patch('/send-forgot-password-Code', authController.sendForgotPasswordCode)
+router.patch('/verify-forgot-password-Code', authController.verifyForgotPasswordCode)
 
 module.exports = router;
