@@ -10,19 +10,12 @@ exports.identifier = (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(403).json({
-            success: false,
-            message: 'Unauthorized'
-        });
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
     try {
-        // ✅ extra safety check (prevents crash if malformed)
         if (!token.startsWith('Bearer ')) {
-            return res.status(403).json({
-                success: false,
-                message: 'Invalid token format'
-            });
+            return res.status(403).json({ success: false, message: 'Invalid token format' });
         }
 
         const userToken = token.split(' ')[1];
@@ -32,7 +25,6 @@ exports.identifier = (req, res, next) => {
             process.env.TOKEN_SECRET
         );
 
-        // ✅ attach clean user object
         req.user = {
             userId: jwtVerified.userId,
             email: jwtVerified.email,
@@ -44,9 +36,6 @@ exports.identifier = (req, res, next) => {
     } catch (error) {
         console.log(error);
 
-        return res.status(403).json({
-            success: false,
-            message: 'Invalid token'
-        });
+        return res.status(403).json({ success: false, message: 'Invalid token' });
     }
 };

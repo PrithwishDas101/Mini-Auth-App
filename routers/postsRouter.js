@@ -11,6 +11,6 @@ router.post('/create-posts', identifier, postsController.createPosts);
 
 router.put('/update-post/:id', identifier, postsController.updatePost);
 
-// router.delete('/delete-post/:id', identifier, postsController.deletePost);
+router.delete('/delete-post/:id', identifier, postsController.deletePost);
 
 module.exports = router;

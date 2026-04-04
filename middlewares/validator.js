@@ -1,4 +1,4 @@
-const Joi = require('joi'); // ✅ use ONE only
+const Joi = require('joi');
 
 exports.signupSchema = Joi.object({
   email: Joi.string()
@@ -69,7 +69,7 @@ exports.createPostSchema = Joi.object({
     .required(),
 
   description: Joi.string()
-    .min(1) // ✅ FIXED (0 doesn't make sense)
+    .min(1)
     .max(1200)
     .required()
 });
