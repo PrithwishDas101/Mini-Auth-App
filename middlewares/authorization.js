@@ -10,18 +10,43 @@ exports.identifier = (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(403).json({ success: false, message: 'Unauthorized' });
+        return res.status(403).json({
+            success: false,
+            message: 'Unauthorized'
+        });
     }
 
     try {
-        const userToken = token.split(' ')[1];
-        const jwtVerified = jwt.verify(userToken, process.env.TOKEN_SECRET);
+        // ✅ extra safety check (prevents crash if malformed)
+        if (!token.startsWith('Bearer ')) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid token format'
+            });
+        }
 
-        req.user = jwtVerified;
+        const userToken = token.split(' ')[1];
+
+        const jwtVerified = jwt.verify(
+            userToken,
+            process.env.TOKEN_SECRET
+        );
+
+        // ✅ attach clean user object
+        req.user = {
+            userId: jwtVerified.userId,
+            email: jwtVerified.email,
+            verified: jwtVerified.verified
+        };
 
         next();
+
     } catch (error) {
         console.log(error);
-        return res.status(403).json({ success: false, message: 'Invalid token' });
+
+        return res.status(403).json({
+            success: false,
+            message: 'Invalid token'
+        });
     }
 };

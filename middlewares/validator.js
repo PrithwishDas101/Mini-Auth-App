@@ -1,78 +1,75 @@
-const Joi = require('joi');
-const joi = require('joi');
+const Joi = require('joi'); // ✅ use ONE only
 
-exports.signupSchema = joi.object({
-  email: joi.string()
+exports.signupSchema = Joi.object({
+  email: Joi.string()
     .min(6)
-    .max(60).
-    required()
+    .max(60)
+    .required()
     .email({
       tlds: { allow: ['com', 'net'] }
     }),
-  password: joi.string()
+  password: Joi.string()
     .required()
-    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$'))
-})
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+});
 
-exports.signinSchema = joi.object({
-  email: joi.string()
+exports.signinSchema = Joi.object({
+  email: Joi.string()
     .min(6)
-    .max(60).
-    required()
+    .max(60)
+    .required()
     .email({
       tlds: { allow: ['com', 'net'] }
     }),
-  password: joi.string()
+  password: Joi.string()
     .required()
-    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$'))
-})
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+});
 
 exports.acceptorCodeSchema = Joi.object({
-  email: joi.string()
+  email: Joi.string()
     .min(6)
-    .max(60).
-    required()
+    .max(60)
+    .required()
     .email({
       tlds: { allow: ['com', 'net'] }
     }),
-  providedCode: Joi.number()
-  .required()
-})
+  providedCode: Joi.number().required()
+});
 
 exports.changePasswordSchema = Joi.object({
-  newPassword: joi.string()
-  .required()
-  .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$')),
+  newPassword: Joi.string()
+    .required()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/),
 
-  oldPassword: joi.string()
-  .required()
-  .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$'))
-})
+  oldPassword: Joi.string()
+    .required()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+});
 
 exports.acceptFPCodeSchema = Joi.object({
-  email: joi.string()
+  email: Joi.string()
     .min(6)
-    .max(60).
-    required()
+    .max(60)
+    .required()
     .email({
       tlds: { allow: ['com', 'net'] }
     }),
-  providedCode: Joi.number()
-  .required(),
+  providedCode: Joi.number().required(),
 
-  newPassword: joi.string()
-  .required()
-  .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$'))
-})
+  newPassword: Joi.string()
+    .required()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+});
 
 exports.createPostSchema = Joi.object({
-  title: joi.string()
-  .min(6)
-  .max(60)
-  .required(),
-  
-  description: joi.string()
-  .min(0)
-  .max(1200)
-  .required()
+  title: Joi.string()
+    .min(6)
+    .max(60)
+    .required(),
+
+  description: Joi.string()
+    .min(1) // ✅ FIXED (0 doesn't make sense)
+    .max(1200)
+    .required()
 });

@@ -5,22 +5,12 @@ const postsController = require('../controllers/postsController');
 
 router.get('/all-posts', postsController.getPosts);
 
-// router.get('/single-posts', authController.signin);
+router.get('/single-post/:id', postsController.singlePost);
 
 router.post('/create-posts', identifier, postsController.createPosts);
 
+router.put('/update-post/:id', identifier, postsController.updatePost);
 
-/* router.put(
-    '/update-post', 
-    identifier, 
-    authController.sendVerificationCode
-);
+// router.delete('/delete-post/:id', identifier, postsController.deletePost);
 
-router.delete(
-    '/delete-post', 
-    identifier, 
-    authController.verifyVerificationCode
-)
-*/
-
-module.exports = router; 
+module.exports = router;
