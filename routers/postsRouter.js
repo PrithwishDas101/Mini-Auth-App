@@ -4,10 +4,13 @@ const router = express.Router();
 const postsController = require('../controllers/postsController');
 
 router.get('/all-posts', postsController.getPosts);
-/* router.get('/single-posts', authController.signin);
-router.post('/create-posts', identifier, authController.signout);
 
-router.put(
+// router.get('/single-posts', authController.signin);
+
+router.post('/create-posts', identifier, postsController.createPosts);
+
+
+/* router.put(
     '/update-post', 
     identifier, 
     authController.sendVerificationCode

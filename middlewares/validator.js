@@ -64,3 +64,15 @@ exports.acceptFPCodeSchema = Joi.object({
   .required()
   .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$'))
 })
+
+exports.createPostSchema = Joi.object({
+  title: joi.string()
+  .min(6)
+  .max(60)
+  .required(),
+  
+  description: joi.string()
+  .min(0)
+  .max(1200)
+  .required()
+});
