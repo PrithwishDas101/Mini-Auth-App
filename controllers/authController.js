@@ -5,23 +5,24 @@ const { doHash, doHashValidation, hmacProcess } = require("../utils/hashing");
 const transport = require('../middlewares/sendMail');
 
 exports.signup = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
     try {
-        const { error, value } = signupSchema.validate({ email, password });
+        const { error, value } = signupSchema.validate({ email, password, username });
 
         if (error) {
             return res.status(400).json({ success: false, message: error.details[0].message })
         }
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
 
         if (existingUser) {
-            return res.status(401).json({ success: false, message: "User already exists" })
+            return res.status(409).json({ success: false, message: "User or username already exists" })
         }
 
         const hashedPassword = await doHash(password, 12);
 
         const newUser = new User({
             email,
+            username,
             password: hashedPassword,
         })
 
@@ -52,7 +53,7 @@ exports.signin = async (req, res) => {
         const existingUser = await User.findOne({ email }).select('+password');
 
         if (!existingUser) {
-            return res.status(401).json({ success: false, message: "User does not exist" })
+            return res.status(401).json({ success: false, message: "Invalid email or password" })
         }
 
         const result = await doHashValidation(password, existingUser.password);
@@ -60,7 +61,7 @@ exports.signin = async (req, res) => {
         if (!result) {
             return res.status(401).json({
                 success: false,
-                message: "invalid credentials!"
+                message: "Invalid email or password"
             })
         }
 
@@ -68,6 +69,7 @@ exports.signin = async (req, res) => {
             {
                 userId: existingUser._id,
                 email: existingUser.email,
+                username: existingUser.username,
                 verified: existingUser.verified,
             },
             process.env.TOKEN_SECRET,
@@ -83,7 +85,7 @@ exports.signin = async (req, res) => {
         }).json({
             success: true,
             token,
-            message: "logged in succesfully"
+            message: "Logged in successfully"
         })
 
     } catch (error) {
@@ -317,3 +319,68 @@ exports.verifyForgotPasswordCode = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
+
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        
+        const user = await User.findById(userId).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "User retrieved successfully",
+            user
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+exports.setUsername = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const { username } = req.body;
+
+        if (!username || username.trim().length === 0) {
+            return res.status(400).json({ success: false, message: "Username is required" });
+        }
+
+        if (username.length < 3 || username.length > 30) {
+            return res.status(400).json({ success: false, message: "Username must be 3-30 characters" });
+        }
+
+        if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+            return res.status(400).json({ success: false, message: "Username can only contain letters, numbers, dots, underscores, and hyphens" });
+        }
+
+        // Check if username already exists
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername && existingUsername._id.toString() !== userId) {
+            return res.status(409).json({ success: false, message: "Username already taken" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { username },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Username set successfully",
+            user
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};

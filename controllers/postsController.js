@@ -14,7 +14,7 @@ exports.getPosts = async (req, res) => {
             .limit(postsPerPage)
             .populate({
                 path: 'userId',
-                select: 'email'
+                select: 'username email'
             });
 
         return res.status(200).json({ success: true, message: "posts", data: result });
@@ -31,7 +31,7 @@ exports.singlePost = async (req, res) => {
     try {
         const post = await Post.findById(id).populate({
             path: 'userId',
-            select: 'email'
+            select: 'username email'
         });
 
         if (!post) {

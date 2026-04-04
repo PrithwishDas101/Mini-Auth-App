@@ -8,9 +8,14 @@ exports.signupSchema = Joi.object({
     .email({
       tlds: { allow: ['com', 'net'] }
     }),
+  username: Joi.string()
+    .min(3)
+    .max(30)
+    .required()
+    .pattern(/^[a-zA-Z0-9._-]+$/),
   password: Joi.string()
     .required()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+    .min(6)
 });
 
 exports.signinSchema = Joi.object({
@@ -23,7 +28,7 @@ exports.signinSchema = Joi.object({
     }),
   password: Joi.string()
     .required()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+    .min(6)
 });
 
 exports.acceptorCodeSchema = Joi.object({
@@ -40,11 +45,11 @@ exports.acceptorCodeSchema = Joi.object({
 exports.changePasswordSchema = Joi.object({
   newPassword: Joi.string()
     .required()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/),
+    .min(6),
 
   oldPassword: Joi.string()
     .required()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+    .min(6)
 });
 
 exports.acceptFPCodeSchema = Joi.object({
@@ -59,7 +64,7 @@ exports.acceptFPCodeSchema = Joi.object({
 
   newPassword: Joi.string()
     .required()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/)
+    .min(6)
 });
 
 exports.createPostSchema = Joi.object({
